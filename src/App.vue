@@ -1,17 +1,50 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <h1>Todo list</h1>
+  <TodoList
+    :todo="todoItems"
+    @updateTodo="updateTodo"
+    @removeTodo="removeTodo"
+  />
+  <CreateTodo @addTodo="addTodo" />
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import CreateTodo from "./components/CreateTodo.vue";
+import TodoList from "./components/TodoList.vue";
 
 export default {
-  name: 'App',
+  name: "App",
   components: {
-    HelloWorld
-  }
-}
+    CreateTodo,
+    TodoList,
+  },
+  data() {
+    return { todoItems: [] };
+  },
+  methods: {
+    addTodo(todoItem) {
+      this.todoItems.push(todoItem);
+    },
+    updateTodo(index) {
+      this.todoItems[index].completed = !this.todoItems[index].completed;
+    },
+    removeTodo(todoItem, index) {
+      this.todoItems.splice(index, 1);
+      localStorage.removeItem(todoItem.item);
+    },
+  },
+  created() {
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      try {
+        const value = JSON.parse(localStorage.getItem(key));
+        this.todoItems.push(value);
+      } catch (e) {
+        console.error("error", e);
+      }
+    }
+  },
+};
 </script>
 
 <style>
@@ -22,5 +55,9 @@ export default {
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+}
+body {
+  display: flex;
+  justify-content: center;
 }
 </style>
